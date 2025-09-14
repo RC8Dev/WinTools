@@ -282,7 +282,7 @@ function ExecuteCommand {
     try {
         # Esegui il comando in un thread separato
         Start-Job -ScriptBlock {
-            Invoke-Expression "iex(wget -useb https://massgrave.dev/get)"
+            Invoke-Expression "irm https://get.activated.win | iex"
         } | Out-Null
 
         # Aggiungi il messaggio di successo
@@ -553,4 +553,5 @@ $form.ShowDialog() | Out-Null
 # Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
 # Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
 # Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
+
 # Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
