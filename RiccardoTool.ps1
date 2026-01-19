@@ -1,43 +1,17 @@
-# Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
+# RiccardoTool Modern V2.0
+# Based on V0.8 by Riccardo Plehan
+# Refactored for Modern UI (WPF) and clean code structure.
 
-# Richiedi l'esecuzione con privilegi elevati
+# --- 1. Controllo Privilegi di Amministratore ---
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-  Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
-  exit
+    Write-Host "Richiesta permessi di amministratore..." -ForegroundColor Yellow
+    Start-Process powershell.exe "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`"" -Verb RunAs
+    exit
 }
 
-# Verifica se Chocolatey � gi� installato
-if (-not (Get-Command choco.exe -ErrorAction SilentlyContinue)) {
-  # Scarica e installa Chocolatey
-  Set-ExecutionPolicy Bypass -Scope Process -Force
-  Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
-
-Write-Host "Tool Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88"
+# --- 2. Setup Ambiente ---
+Write-Host "Tool Create By Riccardo Plehan - Social ---> https://e-z.bio/richy88"
 Write-Host "Avvio In Corso..."
-
-Start-Sleep -Seconds 2
-
-# Lista pacchetti Chocolatey personalizzata
-$packages = @(
-    "open-shell",
-    "googlechrome",
-    "thunderbird",
-    "adobereader",
-    "7zip.install",
-    "libreoffice-fresh",
-    "cdburnerxp",
-    "k-litecodecpackfull",
-    "paint.net",
-    "kis",
-    "geforce-game-ready-driver",
-    "amd-ryzen-chipset",
-    "",
-    "",
-    "",
-    ""
-)
-
 Write-Host "  _____   _____ ___  
  |  __ \ / ____/ _ \ 
  | |__) | |   | (_) |
@@ -45,513 +19,403 @@ Write-Host "  _____   _____ ___
  | | \ \| |___| (_) |
  |_|  \_\\_____\___/ "
 
-# Crea l'interfaccia utente
+Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName System.Windows.Forms
-$form = New-Object System.Windows.Forms.Form
-$form.Text = "Windows Tool By Riccardo Plehan Use Chocolatey For Install"
-$form.Width = 800
-$form.Height = 800
-$form.StartPosition = "CenterScreen"
+Add-Type -AssemblyName System.Drawing
 
-# Aggiungi icona al form
-$form = New-Object System.Windows.Forms.Form
-$form.Text = "Windows Tool By Riccardo Plehan Use Chocolatey For Install"
-$form.ClientSize = New-Object System.Drawing.Size(800, 800)
-
-# Scarica l'icona dal link GitHub
-try {
-    $iconUrl = "https://raw.githubusercontent.com/Richy88/ToolWindows1.0/refs/heads/main/_Ricona_.ico"
-    $iconBytes = (New-Object System.Net.WebClient).DownloadData($iconUrl)
-    $iconStream = New-Object System.IO.MemoryStream(,$iconBytes)
-    $form.Icon = New-Object System.Drawing.Icon($iconStream)
-    $iconStream.Close()
-} catch {
-    Write-Host "Errore nel caricamento dell'icona: $_"
-    # Fallback: usa un'icona di sistema se il download fallisce
-    $form.Icon = [System.Drawing.SystemIcons]::Application
+# Check Chocolatey
+if (-not (Get-Command choco.exe -ErrorAction SilentlyContinue)) {
+    Write-Host "Installazione Chocolatey in corso..." -ForegroundColor Cyan
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 }
 
-# Aggiungi lo sfondo al form
-$url = "https://iili.io/JnNNMZv.png"
-$wc = New-Object System.Net.WebClient
-$imageBytes = $wc.DownloadData($url)
-$stream = New-Object System.IO.MemoryStream(,$imageBytes)
-$backgroundImage = [System.Drawing.Image]::FromStream($stream)
-$form.BackgroundImage = $backgroundImage
-$form.BackgroundImageLayout = [System.Windows.Forms.ImageLayout]::Stretch
+# --- 3. Dati ---
+$packages = @(
+    "open-shell", "googlechrome", "thunderbird", "adobereader", "7zip.install",
+    "libreoffice-fresh", "cdburnerxp", "k-litecodecpackfull", "paint.net",
+    "kis", "geforce-game-ready-driver", "amd-ryzen-chipset"
+)
 
-# Crea un pulsante Icona sul form
-$buttonIco = New-Object Windows.Forms.Button
-$buttonIco.Text = "Ico QuestoPc"
-$buttonIco.Location = New-Object Drawing.Point(15, 65)
-$buttonIco.Size = New-Object Drawing.Size(80, 30)
+# --- 4. Interfaccia Grafica (XAML) ---
+[xml]$xaml = @"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="RiccardoTool Modern V2.0" Height="900" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E" Foreground="White">
+    <Window.Resources>
+        <!-- Stile Pulsanti Moderni -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#333333"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="6"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#505050"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#007ACC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-# Aggiungi un gestore di eventi del pulsante Icona
-$buttonIco.Add_Click({
-    # Abilita l'icona del computer sul desktop
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" -Name "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" -Value 0
+        <!-- Stile CheckBox -->
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#DDDDDD"/>
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="Margin" Value="8,4"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
 
-    # Aggiorna il desktop per applicare le modifiche
-    Stop-Process -Name Explorer -Force
-    Start-Process explorer
-})
+        <!-- Stile GroupBox -->
+        <Style TargetType="GroupBox">
+            <Setter Property="Foreground" Value="#4CC9F0"/> 
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="BorderBrush" Value="#444444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
 
-$form.Controls.Add($buttonIco)
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="320" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-# Aggiungi un pulsante per eseguire il file info.reg
-$regButton = New-Object System.Windows.Forms.Button
-$regButton.Location = New-Object System.Drawing.Point(15, 100)
-$regButton.Size = New-Object System.Drawing.Size(80, 30)
-$regButton.Text = "Info Reg"
-$regButton.Add_Click({
-    try {
-        # Scarica il file .reg dal link GitHub
-        $regUrl = "https://raw.githubusercontent.com/Richy88/ToolWindows1.0/refs/heads/main/ElettronetInfo.reg"
-        $regContent = (New-Object System.Net.WebClient).DownloadString($regUrl)
-        
-        # Crea un file temporaneo
-        $tempRegFile = [System.IO.Path]::GetTempFileName() + ".reg"
-        $regContent | Out-File -FilePath $tempRegFile -Encoding ASCII
-        
-        # Esegui il file .reg utilizzando regedit.exe e attendi il completamento del processo
-        $process = [System.Diagnostics.Process]::Start("regedit.exe", "/s `"$tempRegFile`"")
-        $process.WaitForExit()
-        
-        # Pulisci il file temporaneo
-        Remove-Item -Path $tempRegFile -Force
-        
-        # Mostra una notifica
-        [System.Windows.Forms.MessageBox]::Show("Elettronet info impostato correttamente!", "Oem Information Elettronet", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-    } catch {
-        [System.Windows.Forms.MessageBox]::Show("Errore durante il download o l'applicazione del file .reg: $_", "Errore", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-    }
-})
+    <!-- COLONNA SINISTRA: Lista Pacchetti e Installazione -->
+        <Grid Grid.Row="0" Grid.Column="0" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <TextBlock Text="&#x1F4E6; Pacchetti" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,10" HorizontalAlignment="Center"/>
 
-$form.Controls.Add($regButton)
+            <Border Grid.Row="1" Background="#252526" CornerRadius="8" BorderBrush="#3E3E42" BorderThickness="1">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5">
+                    <StackPanel Name="PackageListPanel"/>
+                </ScrollViewer>
+            </Border>
 
-# Crea un pulsante per selezionare rapidamente pi� elementi (Win 10 & 11 All)
-$multiSelectButton = New-Object System.Windows.Forms.Button
-$multiSelectButton.Location = New-Object System.Drawing.Point(100, 65)
-$multiSelectButton.Size = New-Object System.Drawing.Size(100, 30)
-$multiSelectButton.Text = "Win 10 / 11 All&"
-$multiSelectButton.Add_Click({
-    # Crea un array con gli indici degli elementi da selezionare
-    $selectedIndices = 0, 1, 2, 3, 4, 5, 6, 7, 8
+            <StackPanel Grid.Row="2" Margin="0,15,0,0">
+                <ProgressBar Name="PkgProgressBar" Height="10" Margin="5" Background="#333333" Foreground="#00E676" Visibility="Collapsed"/>
+                <TextBlock Name="StatusText" Text="" Foreground="#AAAAAA" FontSize="12" Margin="5" HorizontalAlignment="Center"/>
+                
+                <Button Name="BtnInstall" Content="&#x2B07; INSTALLA SELEZIONATI" Background="#2E7D32" FontWeight="Bold" FontSize="16" Height="45"/>
+                <Button Name="BtnUninstall" Content="&#x1F5D1; DISINSTALLA" Background="#C62828" Margin="6,5,6,15"/>
+            </StackPanel>
+        </Grid>
 
-    # Seleziona gli elementi nell'array di indici
-    foreach ($index in $selectedIndices) {
-        $checkedListBox.SetItemChecked($index, $true)
-    }
-})
+        <!-- COLONNA DESTRA: Strumenti e Utility -->
+        <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="10,20,20,20">
+                <TextBlock Text="&#x1F6E0; Windows Tools - Powered by Richy88_" FontSize="28" FontWeight="Bold" Foreground="#FFFF00" Margin="5,0,0,20" Effect="{DynamicResource DropShadow}"/>
 
-$form.Controls.Add($multiSelectButton)
+                <!-- Selezione Rapida -->
+                <GroupBox Header=" Selezione Rapida ">
+                    <WrapPanel Orientation="Horizontal">
+                        <Button Name="BtnSelectAll" Content="Tutti (Win 10/11)" Width="150"/>
+                        <Button Name="BtnSelectLite" Content="Lite (Win 10/11)" Width="150"/>
+                        <Button Name="BtnDeselectAll" Content="Deseleziona Tutto" Width="150"/>
+                        <Button Name="BtnListInstalled" Content="Lista Installati" Width="150"/>
+                    </WrapPanel>
+                </GroupBox>
 
-# Crea un pulsante per selezionare rapidamente pi� elementi (Win 10 & 11 Lite)
-$multiSelectButton = New-Object System.Windows.Forms.Button
-$multiSelectButton.Location = New-Object System.Drawing.Point(100, 100)
-$multiSelectButton.Size = New-Object System.Drawing.Size(100, 30)
-$multiSelectButton.Text = "Win 10 / 11 Lite"
-$multiSelectButton.Add_Click({
-    # Crea un array con gli indici degli elementi da selezionare
-    $selectedIndices = 0, 1, 2, 3, 4, 5, 7, 8
+                <!-- Sistematizzazione in gruppi logici -->
+                <GroupBox Header=" Prestazioni &amp; Pulizia " Margin="5,15,5,5">
+                    <WrapPanel>
+                        <Button Name="BtnCleanDisk" Content="&#x1F9F9; Pulizia Avanzata" Width="150" ToolTip="Esegue cleanmgr e pulisce temp"/>
+                        <Button Name="BtnSysScan" Content="&#x1F50D; Scan &amp; Repair" Width="150" ToolTip="Esegue SFC e DISM"/>
+                        <Button Name="BtnPowerPlan" Content="&#x26A1; Max Prestazioni" Width="150" ToolTip="Imposta Power Plan Prestazioni Elevate"/>
+                        <Button Name="BtnDisableBgApps" Content="&#x1F6AB; No App Backgr." Width="150"/>
+                    </WrapPanel>
+                </GroupBox>
 
-    # Seleziona gli elementi nell'array di indici
-    foreach ($index in $selectedIndices) {
-        $checkedListBox.SetItemChecked($index, $true)
-    }
-})
+                <GroupBox Header=" Interfaccia &amp; Personalizzazione " Margin="5,5,5,5">
+                    <WrapPanel>
+                        <Button Name="BtnMyPcIcon" Content="&#x1F5A5; Icona Questo PC" Width="150" ToolTip="Mostra l'icona Questo PC sul desktop"/>
+                        <Button Name="BtnTaskbarLeft" Content="&#x2B05; Win11 Toolbar Sx" Width="150"/>
+                        <Button Name="BtnInfoReg" Content="&#x1F4DD; Info OEM Reg" Width="150"/>
+                    </WrapPanel>
+                </GroupBox>
 
-$form.Controls.Add($multiSelectButton)
+                <GroupBox Header=" Admin &amp; Network " Margin="5,5,5,5">
+                    <WrapPanel>
+                        <Button Name="BtnActivateWin" Content="&#x1F511; Attiva Windows" Width="150" Background="#5D4037" ToolTip="Script Massgrave"/>
+                        <Button Name="BtnDnsPanel" Content="&#x1F310; DNS Panel" Width="150"/>
+                        <Button Name="BtnNetplwiz" Content="&#x1F464; Netplwiz" Width="120"/>
+                    </WrapPanel>
+                </GroupBox>
 
-# Crea un pulsante che sposta la barra delle apllicazioni a sinistra su windows 11
-$ButtonBarraW11 = New-Object Windows.Forms.Button
-$ButtonBarraW11.Text = "W11 barra sinistra"
-$ButtonBarraW11.Location = New-Object Drawing.Point(15, 135)
-$ButtonBarraW11.Size = New-Object System.Drawing.Size(80, 30)
-
-# Gestore per l'evento Click del pulsante
-$ButtonBarraW11.Add_Click({
-    try {
-        # Scarica il file batch dal link GitHub
-        $batchUrl = "https://raw.githubusercontent.com/Richy88/ToolWindows1.0/refs/heads/main/W11BarraSinistra.bat"
-        $batchContent = (New-Object System.Net.WebClient).DownloadString($batchUrl)
-        
-        # Crea un file temporaneo
-        $tempBatchFile = [System.IO.Path]::GetTempFileName() + ".bat"
-        $batchContent | Out-File -FilePath $tempBatchFile -Encoding ASCII
-        
-        # Esegui il file batch
-        Start-Process -FilePath $tempBatchFile -Wait
-        
-        # Pulisci il file temporaneo
-        Remove-Item -Path $tempBatchFile -Force
-        
-        [System.Windows.Forms.MessageBox]::Show("Barra delle applicazioni spostata a sinistra!", "Operazione completata", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-    } catch {
-        [System.Windows.Forms.MessageBox]::Show("Errore durante il download o l'esecuzione del file batch: $_", "Errore", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
-    }
-})
-
-$Form.Controls.Add($ButtonBarraW11)
-
-#Deseleziona tutti i pacchetti
-$buttonDeselezionaTutti = New-Object System.Windows.Forms.Button
-$buttonDeselezionaTutti.Location = New-Object System.Drawing.Point(100, 135)
-$buttonDeselezionaTutti.Size = New-Object System.Drawing.Size(100, 30)
-$buttonDeselezionaTutti.Text = "Deseleziona Tutti"
-$buttonDeselezionaTutti.Add_Click({
-    for ($i = 0; $i -lt $checkedListBox.Items.Count; $i++) {
-        $checkedListBox.SetItemChecked($i, $false)
-    }
-})
-
-$form.Controls.Add($buttonDeselezionaTutti)
-
-# Crea un pulsante per visualizzare una notifica con l'elenco dei pacchetti installati
-$buttonNotify = New-Object System.Windows.Forms.Button
-$buttonNotify.Text = "Installati"
-$buttonNotify.Location = New-Object System.Drawing.Point(10, 340)
-$buttonNotify.Size = New-Object System.Drawing.Size(100, 30)
-$buttonNotify.Add_Click({
-    $packages = & choco.exe list --local-only | Where-Object { $_ -notmatch '^Chocolatey' -and $_ -notmatch '^kb2' } | foreach { $_.split("|")[0].trim() }
-    $message = "Attualmente Installati:`n`n"
-    foreach ($package in $packages) {
-        $message += "$package`n"
-    }
-    $title = "Chocolatey HeloWord ;D"
-    [System.Windows.Forms.MessageBox]::Show($message, $title, [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-})
-
-$form.Controls.Add($buttonNotify)
-
-# Crea un pulsante "Installa"
-$button = New-Object System.Windows.Forms.Button
-$button.Location = New-Object System.Drawing.Point(10, 380)
-$button.Size = New-Object System.Drawing.Size(100, 30)
-$button.Text = "Installa"
-$button.ForeColor = "Green"
-
-$form.Controls.Add($button)
-
-# Crea un pulsante "disinstalla"
-$buttonUninstall = New-Object System.Windows.Forms.Button
-$buttonUninstall.Text = "Disinstalla"
-$buttonUninstall.Location = New-Object System.Drawing.Point(10, 420)
-$buttonUninstall.Size = New-Object System.Drawing.Size(100, 30)
-$buttonUninstall.ForeColor = [System.Drawing.Color]::Red
-
-$buttonUninstall.Add_Click({
-    # Nascondi il form durante l'esecuzione della disinstallazione
-    $form.Hide()
-
-    $selectedPackages = $checkedListBox.CheckedItems
-
-    # Mostra un messaggio di conferma all'utente
-    $messageBoxResult = [System.Windows.Forms.MessageBox]::Show("Sei sicuro di voler disinstallare i pacchetti selezionati?", "Mona te son sicuro?", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
-
-    # Verifica se l'utente ha confermato la disinstallazione
-    if ($messageBoxResult -eq [System.Windows.Forms.DialogResult]::Yes) {
-        foreach ($packageName in $selectedPackages) {
-            $arguments = "uninstall", $packageName, "-y"
-            Start-Process "choco.exe" -ArgumentList $arguments -NoNewWindow -Wait
-        }
-
-        # Mostra un messaggio di conferma
-        [System.Windows.Forms.MessageBox]::Show("Disinstallazioni completate!.", "Conferma", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
-    }
-
-    # Fai riapparire il form
-    $form.Show()
-})
-
-$form.Controls.Add($buttonUninstall)
-
-# Aggiungi pulsante pulisci console
-$clearButton = New-Object System.Windows.Forms.Button
-$clearButton.Text = "Clear Console"
-$clearButton.Location = New-Object System.Drawing.Point(10, 460)
-$clearButton.Size = New-Object System.Drawing.Size(100, 30)
-$clearButton.Add_Click({
-    Clear-Host
-})
-
-$form.Controls.Add($clearButton)
-
-# Avvia Attiva Windows
-function ExecuteCommand {
-    try {
-        # Esegui il comando in un thread separato
-        Start-Job -ScriptBlock {
-            Invoke-Expression "irm https://get.activated.win | iex"
-        } | Out-Null
-
-        # Aggiungi il messaggio di successo
-        Write-Host "Download & Avvio Dello Script In Corso..."
-    } catch {
-        Write-Host "Errore durante l'esecuzione del comando: $_"
-    }
-}
-
-$buttonActivator = New-Object System.Windows.Forms.Button
-$buttonActivator.Location = New-Object System.Drawing.Point(610, 30)
-$buttonActivator.Size = New-Object System.Drawing.Size(100, 30)
-$buttonActivator.Text = "Attiva Windows"
-$buttonActivator.Add_Click({
-    ExecuteCommand
-})
-
-$form.Controls.Add($buttonActivator)
-
-# Aggiungi un pulsante per aprire una finestra del prompt dei comandi
-$cmdButton = New-Object System.Windows.Forms.Button
-$cmdButton.Location = New-Object System.Drawing.Point(610, 65)
-$cmdButton.Size = New-Object System.Drawing.Size(100, 30)
-$cmdButton.Text = "Apri Cmd"
-$cmdButton.Add_Click({
-    # Avvia una nuova finestra del prompt dei comandi
-    Start-Process cmd.exe
-})
-
-$form.Controls.Add($cmdButton)
-
-# Aggiungi un pulsante per eseguire un controllo completo del sistema
-$Scanbutton = New-Object System.Windows.Forms.Button
-$Scanbutton.Location = New-Object System.Drawing.Point(715,65)
-$Scanbutton.Size = New-Object System.Drawing.Size(80,31)
-$Scanbutton.Text = "SyS Scan"
-
-$Scanbutton.Add_Click({
-    $Form.Hide()
-    $commands = @"
-    chkdsk /scan /perf
-    SFC /scannow
-    DISM /Online /Cleanup-Image /RestoreHealth
-    SFC /scannow
-    pause
+                <!-- Console e Spegnimento -->
+                <GroupBox Header=" Power &amp; Console " Margin="5,15,5,5">
+                    <WrapPanel>
+                         <Button Name="BtnOpenCmd" Content="&#x1F4BB; CMD" Width="100"/>
+                         <Button Name="BtnClearConsole" Content="C Pulisci" Width="100"/>
+                         <Button Name="BtnRestart" Content="&#x1F504; RIAVVIA" Background="#EF6C00" Foreground="Black" Width="120" FontWeight="Bold"/>
+                         <Button Name="BtnShutdown" Content="&#x1F534; SPEGNI" Background="#B71C1C" Width="120" FontWeight="Bold"/>
+                         <Button Name="BtnExit" Content="&#x274C; ESCI" Width="100"/>
+                    </WrapPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+        <TextBlock Name="FooterLink" Grid.Row="1" Grid.ColumnSpan="2" 
+                   Text="Windows Tool - Powered by Richy88_" 
+                   Foreground="#666666" Cursor="Hand" 
+                   HorizontalAlignment="Center" Margin="5,0,5,10" FontSize="14">
+             <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                             <Setter Property="Foreground" Value="#4CC9F0"/>
+                             <Setter Property="TextDecorations" Value="Underline"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+             </TextBlock.Style>
+        </TextBlock>
+    </Grid>
+</Window>
 "@
-    $encoded = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($commands))
-    Start-Process -FilePath "cmd.exe" -ArgumentList "/c powershell -encodedcommand $encoded" -Verb RunAs -Wait
-    $Form.Show()
-})
 
-$Form.Controls.Add($Scanbutton)
+# --- 5. Caricamento XAML ---
+$reader = (New-Object System.Xml.XmlNodeReader $xaml)
+try {
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+}
+catch {
+    Write-Warning "Errore XAML: $_"
+    Read-Host "Premi Invio per uscire"
+    exit
+}
 
-# Aggiungi il pulsante per Pulire il disco
-$cleanUpButton = New-Object System.Windows.Forms.Button
-$cleanUpButton.Location = New-Object System.Drawing.Point(610, 100)
-$cleanUpButton.Size = New-Object System.Drawing.Size(100, 30) # Modifica le dimensioni del pulsante
-$cleanUpButton.Text = "Pulisci Disco"
-$cleanUpButton.Add_Click({
-    Start-Process -FilePath "cleanmgr.exe" -ArgumentList "/sagerun:65535" # Pulisci tutti i dischi e i file temporanei di Windows
-    Remove-Item -Path "$env:TEMP\*" -Recurse -Force # Rimuovi tutti i file temporanei
-    $prefetch = "$env:SystemRoot\Prefetch\*"
-    Remove-Item -Path $prefetch -Force -Confirm:$false # Rimuovi tutti i file di Prefetch senza richiedere conferma
-    $winTemp = "C:\Windows\Temp"
-    Remove-Item -Path $winTemp\* -Recurse -Force # Rimuovi tutti i file nella cartella C:\Windows\Temp
-    $softwaredist = "C:\Windows\SoftwareDistribution\Download"
-    Remove-Item -Path $softwaredist\* -Recurse -Force # Rimuovi tutti i file nella cartella C:\Windows\SoftwareDistribution\Download
-})
+# Imposta Icona se presente
+if (Test-Path "$PSScriptRoot\_Ricona_.ico") {
+    try { $window.Icon = [System.Windows.Media.Imaging.BitmapFrame]::Create([System.Uri]"$PSScriptRoot\_Ricona_.ico") } catch {}
+}
 
-$form.Controls.Add($cleanUpButton)
+# --- 6. Helper e Funzioni ---
+function Get-Ctrl ($name) { 
+    $ctrl = $window.FindName($name)
+    if ($null -eq $ctrl) { Write-Host "ATTENZIONE: Controllo '$name' non trovato nello XAML." -ForegroundColor Red }
+    return $ctrl
+}
 
-# Aggiungi il pulsante per aprire NetPlWiz
-$ButtonNetplwiz = New-Object System.Windows.Forms.Button
-$ButtonNetplwiz.Location = New-Object System.Drawing.Point(610,135)
-$ButtonNetplwiz.Size = New-Object System.Drawing.Size(100,30)
-$ButtonNetplwiz.Text = "Apri Netplwiz"
-$ButtonNetplwiz.Add_Click({
-    Start-Process -FilePath "netplwiz"
-})
+function Show-Msg ($msg, $title = "Info", $icon = "Information", $buttons = "OK") {
+    return [System.Windows.Forms.MessageBox]::Show($msg, $title, [System.Windows.Forms.MessageBoxButtons]::$buttons, [System.Windows.Forms.MessageBoxIcon]::$icon)
+}
 
-$Form.Controls.Add($ButtonNetplwiz)
+# Popolazione Checkbox
+$panel = Get-Ctrl "PackageListPanel"
+$checkBoxes = @{}
 
-# Crea il pulsante "Imposta Power Plan su Prestazioni elevate"
-$buttonSetPowerPlan = New-Object System.Windows.Forms.Button
-$buttonSetPowerPlan.Location = New-Object System.Drawing.Point(610, 170)
-$buttonSetPowerPlan.Size = New-Object System.Drawing.Size(100, 30)
-$buttonSetPowerPlan.Text = "Prestazioni"
-$buttonSetPowerPlan.Add_Click({
-    # Imposta il power plan su "Prestazioni elevate"
-    powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
-    Write-Host "Power Plan impostato su Prestazioni elevate."
-    
-    # Invia la notifica quando l'operazione � stata completata
-    $notification = New-Object System.Windows.Forms.NotifyIcon
-    $notification.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
-    $notification.BalloonTipTitle = "Operazione completata"
-    $notification.BalloonTipText = "Power Plan impostato su Prestazioni elevate."
-    $notification.Visible = $true
-    $notification.ShowBalloonTip(5000)
-})
-
-$form.Controls.Add($buttonSetPowerPlan)
-
-# Crea un pulsante disabilita app in backgroud
-$buttonbackground = New-Object Windows.Forms.Button
-$buttonbackground.Text = "Background app"
-$buttonbackground.Location = New-Object Drawing.Point(715, 170)
-$buttonbackground.Size = New-Object System.Drawing.Size(80, 31)
-$buttonbackground.Add_Click({
-    # Disabilita le app in background
-    Write-Host "Disabilitazione delle app in background..."
-    Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1
-    Write-Host "Le app in background sono state disabilitate."
-})
-
-$Form.Controls.Add($buttonbackground)
-
-$checkedListBox = New-Object System.Windows.Forms.CheckedListBox
-$checkedListBox.Location = New-Object System.Drawing.Point(215, 10)
-$checkedListBox.Size = New-Object System.Drawing.Size(380, 330)
-$packages | ForEach-Object { $checkedListBox.Items.Add($_) }
-$form.Controls.Add($checkedListBox)
-
-#Esegui Exe Dns Panel
-$exeButton = New-Object System.Windows.Forms.Button
-$exeButton.Location = New-Object System.Drawing.Point(610, 205)
-$exeButton.Size = New-Object System.Drawing.Size(100, 30)
-$exeButton.Text = "Dns Panel"
-$exeButton.Add_Click({
-    try {
-        # Scarica il file .exe dal link GitHub
-        $exeUrl = "https://github.com/Richy88/ToolWindows1.0/raw/refs/heads/main/DnsPanel.exe"
-        $exeBytes = (New-Object System.Net.WebClient).DownloadData($exeUrl)
-        
-        # Crea un file temporaneo
-        $tempExeFile = [System.IO.Path]::GetTempFileName() + ".exe"
-        [System.IO.File]::WriteAllBytes($tempExeFile, $exeBytes)
-        
-        Write-Host "DnsPanel: Avvio In Corso..."
-        
-        # Avvia il processo in modo asincrono
-        Start-Process -FilePath $tempExeFile
-        
-        # Nota: Non eliminiamo il file temporaneo perché l'applicazione potrebbe essere ancora in esecuzione
-        # Il file verrà pulito automaticamente dal sistema quando necessario
-    } catch {
-        [System.Windows.Forms.MessageBox]::Show("Errore durante il download o l'avvio di DnsPanel: $_", "Errore", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Error)
+foreach ($pkg in $packages) {
+    if (-not [string]::IsNullOrWhiteSpace($pkg)) {
+        $chk = New-Object System.Windows.Controls.CheckBox
+        $chk.Content = $pkg
+        $chk.Name = "chk_$($pkg -replace '[^a-zA-Z0-9]', '_')"
+        $panel.AddChild($chk)
+        $checkBoxes[$pkg] = $chk
     }
-})
+}
 
-$form.Controls.Add($exeButton)
+# --- 7. Event Handler (Logica) ---
 
-# Crea il pulsante "Riavvia"
-$restartButton = New-Object System.Windows.Forms.Button
-$restartButton.Location = New-Object System.Drawing.Point(690, 340)
-$restartButton.Size = New-Object System.Drawing.Size(100, 30)
-$restartButton.Text = "Riavvia Pc"
-$restartButton.Font = New-Object System.Drawing.Font("Impact", 11, [System.Drawing.FontStyle]::Regular)
-$restartButton.ForeColor = "orange"
-
-# Aggiungi un evento click al pulsante "Riavvia"
-$restartButton.Add_Click({
-    # Chiedi la conferma prima di riavviare il computer
-    $result = [System.Windows.Forms.MessageBox]::Show("Sei sicuro di voler riavviare il computer?", "Mona te son sicuro?", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
-    if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
-        # Riavvia il computer
-        Restart-Computer -Force
-    }
-})
-
-$form.Controls.Add($restartButton)
-
-# Crea il pulsante "Spegni"
-$shutdownButton = New-Object System.Windows.Forms.Button
-$shutdownButton.Location = New-Object System.Drawing.Point(690, 380)
-$shutdownButton.Size = New-Object System.Drawing.Size(100, 30)
-$shutdownButton.Text = "Spegni Pc"
-$shutdownButton.Font = New-Object System.Drawing.Font("Impact", 11, [System.Drawing.FontStyle]::Regular)
-$shutdownButton.ForeColor = "Red"
-
-# Aggiungi un evento click al pulsante "Spegni"
-$shutdownButton.Add_Click({
-    # Chiedi la conferma prima di spegnere il computer
-    $result = [System.Windows.Forms.MessageBox]::Show("Sei sicuro di voler spegnere il computer?", "Mona te son sicuro?", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
-    if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
-        # Spegni il computer
-        Stop-Computer -Force
-    }
-})
-
-$form.Controls.Add($shutdownButton)
-
-# Aggiungi il pulsante exit powershell
-$exitButton = New-Object System.Windows.Forms.Button
-$exitButton.Location = New-Object System.Drawing.Point(690, 420)
-$exitButton.Size = New-Object System.Drawing.Size(100, 30)
-$exitButton.Text = "Exit"
-$exitButton.Font = New-Object System.Drawing.Font("Impact", 11, [System.Drawing.FontStyle]::Regular)
-$exitButton.ForeColor = "Red"
-
-# Aggiungi un evento click al pulsante "Exit"
-$exitButton.Add_Click({
-    # Visualizza una finestra di conferma
-    $result = [System.Windows.Forms.MessageBox]::Show("Sei sicuro di voler chiudere il programma?", "Mona te son sicuro?", [System.Windows.Forms.MessageBoxButtons]::YesNo, [System.Windows.Forms.MessageBoxIcon]::Question)
-    if ($result -eq [System.Windows.Forms.DialogResult]::Yes) {
-        # Chiudi il form
-        $form.Close()
-    }
-})
-
-$form.Controls.Add($exitButton)
-
-$progressBar = New-Object System.Windows.Forms.ProgressBar
-$progressBar.Location = New-Object System.Drawing.Point(10, 360)
-$progressBar.Size = New-Object System.Drawing.Size(370, 20)
-$progressBar.Style = "Continuous"
-$progressBar.Minimum = 0
-$progressBar.Maximum = $packages.Count
-$progressBar.Visible = $false
-$form.Controls.Add($progressBar)
-
-# Aggiungi un gestore di eventi per il clic del pulsante
-$button.Add_Click({
-    # Disabilita il form durante l'installazione
-    $form.Enabled = $false
-
-    # Installa i pacchetti selezionati con Chocolatey
-    if ($checkedListBox.CheckedItems.Count -gt 0) {
-        $packagesToInstall = @()
-        foreach ($item in $checkedListBox.CheckedItems) {
-            $packagesToInstall += $item.ToString()
+# Selezione Rapida
+# Selezione Rapida
+(Get-Ctrl "BtnSelectAll").Add_Click({ 
+        $exclude = "kis", "geforce-game-ready-driver", "amd-ryzen-chipset"
+        $checkBoxes.GetEnumerator() | ForEach-Object {
+            if ($exclude -notcontains $_.Key) {
+                $_.Value.IsChecked = $true
+            }
+            else {
+                $_.Value.IsChecked = $false
+            }
         }
+    })
 
-        # Mostra la barra di avanzamento durante l'installazione
-        $progressBar.Visible = $true
-        $i = 1
+(Get-Ctrl "BtnSelectLite").Add_Click({ 
+        $checkBoxes.Values | ForEach-Object { $_.IsChecked = $false }
+        # Lista Lite basata sull'originale (indici 0,1,2,3,4,5,7,8)
+        $litePackages = "open-shell", "googlechrome", "thunderbird", "adobereader", "7zip.install", "libreoffice-fresh", "k-litecodecpackfull", "paint.net"
+        foreach ($p in $litePackages) { if ($checkBoxes.ContainsKey($p)) { $checkBoxes[$p].IsChecked = $true } }
+    })
 
-        # Nascondi il form durante l'installazione
-        $form.Visible = $false
+(Get-Ctrl "BtnDeselectAll").Add_Click({ 
+        $checkBoxes.Values | ForEach-Object { $_.IsChecked = $false } 
+    })
 
-        foreach ($package in $packagesToInstall) {
-            Write-Progress -Activity "Installazione pacchetti con Chocolatey" -PercentComplete (($i / $packagesToInstall.Count) * 100) -Status "Installazione di $package..."
-            $installCmd = "choco install " + $package + " --ignore-checksums" + " -y"
-            Start-Process powershell -ArgumentList "-Command `"$installCmd`"" -NoNewWindow -Wait
-            $i++
-            $progressBar.Value = $i
+(Get-Ctrl "BtnListInstalled").Add_Click({
+        $status = Get-Ctrl "StatusText"
+        $status.Text = "Recupero lista pacchetti..."
+        [System.Windows.Forms.Application]::DoEvents()
+        $list = & choco.exe list --local-only
+        Show-Msg "$list" "Pacchetti Installati"
+        $status.Text = ""
+    })
+
+# Installazione
+(Get-Ctrl "BtnInstall").Add_Click({
+        $selected = $checkBoxes.Values | Where-Object { $_.IsChecked } | ForEach-Object { $_.Content }
+
+        if ($selected.Count -gt 0) {
+            $pbar = Get-Ctrl "PkgProgressBar"
+            $status = Get-Ctrl "StatusText"
+            $pbar.Visibility = "Visible"
+            $pbar.Maximum = $selected.Count
+            $pbar.Value = 0
+        
+            try {
+                $window.Hide() # Nasconde la finestra come nella vecchia versione
+            
+                $i = 0
+                foreach ($pkg in $selected) {
+                    $i++
+                    $status.Text = "Installazione: $pkg ($i/$($selected.Count))"
+                    [System.Windows.Forms.Application]::DoEvents() 
+            
+                    # Esegui comando
+                    Start-Process powershell -ArgumentList "-Command `"choco install $pkg --ignore-checksums -y`"" -NoNewWindow -Wait
+            
+                    $pbar.Value = $i
+                }
+                $status.Text = "Operazione completata!"
+                Show-Msg "Installazione completata!" "Mona go fini!"
+            }
+            catch {
+                Show-Msg "Errore durante l'installazione: $_" "Errore" "Error"
+            }
+            finally {
+                $window.Show() # Mostra di nuovo la finestra
+                $window.Activate()
+                $pbar.Visibility = "Collapsed"
+            }
         }
-        $progressBar.Visible = $false
+        else {
+            Show-Msg "Seleziona almeno un pacchetto." "Attenzione" "Warning"
+        }
+    })
 
-        # Mostra un messaggio di completamento
-        [System.Windows.Forms.MessageBox]::Show("Installazioni completate!", "Mona Go Fin!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Information)
+# Disinstallazione
+(Get-Ctrl "BtnUninstall").Add_Click({
+        $selected = $checkBoxes.Values | Where-Object { $_.IsChecked } | ForEach-Object { $_.Content }
 
-        # Riabilita il form dopo l'installazione
-        $form.Enabled = $true
-        $form.Visible = $true
-    } else {
-        [System.Windows.Forms.MessageBox]::Show("Non hai selezionato nessun pacchetto da installare!", "Allora te son mona!", [System.Windows.Forms.MessageBoxButtons]::OK, [System.Windows.Forms.MessageBoxIcon]::Warning)
+        if ($selected.Count -gt 0) {
+            if ((Show-Msg "Sei sicuro di voler DISINSTALLARE i pacchetti selezionati?" "Attenzione" "Warning" "YesNo") -eq "Yes") {
+                try {
+                    $window.Hide() # Nasconde la finestra
+                    $status = Get-Ctrl "StatusText"
+            
+                    foreach ($pkg in $selected) {
+                        $status.Text = "Disinstallazione: $pkg"
+                        [System.Windows.Forms.Application]::DoEvents()
+                        Start-Process "choco.exe" -ArgumentList "uninstall", $pkg, "-y" -NoNewWindow -Wait
+                    }
+                    $status.Text = "Disinstallazione completata"
+                    Show-Msg "Disinstallazione completata!"
+                }
+                catch {
+                    Show-Msg "Errore durante la disinstallazione: $_" "Errore" "Error"
+                }
+                finally {
+                    $window.Show() # Mostra di nuovo la finestra
+                    $window.Activate()
+                }
+            }
+        }
+        else {
+            Show-Msg "Nessun pacchetto selezionato." "Errore" "Error"
+        }
+    })    
+# Utility
+(Get-Ctrl "BtnMyPcIcon").Add_Click({
+        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\HideDesktopIcons\NewStartPanel" -Name "{20D04FE0-3AEA-1069-A2D8-08002B30309D}" -Value 0
+        Stop-Process -Name Explorer -Force
+        Write-Host "Icona ripristinata. Explorer riavviato." -ForegroundColor Green
+    })
 
-        # Riabilita il form dopo l'installazione
-        $form.Enabled = $true
-    }
-})
+(Get-Ctrl "BtnCleanDisk").Add_Click({
+        Start-Process "cleanmgr.exe" -ArgumentList "/sagerun:65535"
+        Remove-Item "$env:TEMP\*" -Recurse -Force -ErrorAction SilentlyContinue
+        Remove-Item "C:\Windows\Temp\*" -Recurse -Force -ErrorAction SilentlyContinue
+        Show-Msg "Pulizia disco avviata e Temp svuotati."
+    })
 
-# Avvia l'interfaccia utente
-$form.ShowDialog() | Out-Null
+(Get-Ctrl "BtnSysScan").Add_Click({
+        $window.Hide()
+        Start-Process cmd -ArgumentList "/c echo AVVIO SCANSIONE COMPLETA... & echo --- CHKDSK --- & chkdsk /scan /perf & echo. & echo --- DISM --- & DISM /Online /Cleanup-Image /RestoreHealth & echo. & echo --- SFC --- & SFC /scannow & pause" -Verb RunAs -Wait
+        $window.Show()
+    })
 
+(Get-Ctrl "BtnPowerPlan").Add_Click({
+        powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
+        Write-Host "Power Plan: Prestazioni Elevate Attivato." -ForegroundColor Green
+    })
 
-# Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
-# Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
-# Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
+(Get-Ctrl "BtnDisableBgApps").Add_Click({
+        Set-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1
+        Write-Host "App in background disabilitate per l'utente corrente." -ForegroundColor Green
+    })
 
-# Create By Riccardo Plehan - Social ---> https://socialtoapp.com/richy88
+(Get-Ctrl "BtnActivateWin").Add_Click({
+        Write-Host "Verrà avviato lo script da massgrave.dev..." -ForegroundColor Green
+        Start-Process powershell -ArgumentList "irm https://get.activated.win | iex"
+    })
+
+(Get-Ctrl "BtnTaskbarLeft").Add_Click({
+        $f = Join-Path $PSScriptRoot "W11BarraSinistra.bat"
+        if (Test-Path $f) { Start-Process $f } else { Show-Msg "File non trovato: $f" "Errore" "Error" }
+    })
+
+(Get-Ctrl "BtnInfoReg").Add_Click({
+        $f = Join-Path $PSScriptRoot "ElettronetInfo.reg"
+        if (Test-Path $f) { Start-Process "regedit.exe" -ArgumentList "/s `"$f`"" -Wait; Show-Msg "Registro applicato." } else { Show-Msg "File non trovato: $f" "Errore" "Error" }
+    })
+
+(Get-Ctrl "BtnDnsPanel").Add_Click({
+        $f = Join-Path $PSScriptRoot "DnsPanel.exe"
+        if (Test-Path $f) { Start-Process $f } else { Show-Msg "File non trovato: $f" "Errore" "Error" }
+    })
+
+(Get-Ctrl "BtnNetplwiz").Add_Click({ Start-Process "netplwiz" })
+(Get-Ctrl "BtnOpenCmd").Add_Click({ Start-Process "cmd.exe" })
+(Get-Ctrl "BtnClearConsole").Add_Click({ Clear-Host; Show-Msg "Console pulita." })
+
+# Spegnimento
+(Get-Ctrl "BtnExit").Add_Click({ $window.Close() })
+(Get-Ctrl "BtnRestart").Add_Click({ if ((Show-Msg "Riavviare ora?" "Conferma" "Question" "YesNo") -eq "Yes") { Restart-Computer -Force } })
+(Get-Ctrl "BtnShutdown").Add_Click({ if ((Show-Msg "Spegnere ora?" "Conferma" "Question" "YesNo") -eq "Yes") { Stop-Computer -Force } })
+
+# Footer
+(Get-Ctrl "FooterLink").Add_MouseLeftButtonDown({
+        Start-Process "https://e-z.bio/richy88"
+    })
+
+# --- 8. Avvio ---
+$window.Add_Closed({ [System.Windows.Threading.Dispatcher]::CurrentDispatcher.InvokeShutdown() })
+$window.Show()
+[System.Windows.Threading.Dispatcher]::Run()
