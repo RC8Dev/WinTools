@@ -387,18 +387,44 @@ foreach ($pkg in $packages) {
     })
 
 (Get-Ctrl "BtnTaskbarLeft").Add_Click({
-        $f = Join-Path $PSScriptRoot "W11BarraSinistra.bat"
-        if (Test-Path $f) { Start-Process $f } else { Show-Msg "File non trovato: $f" "Errore" "Error" }
+        $url = "https://raw.githubusercontent.com/RC8Dev/WinTools/main/W11BarraSinistra.bat"
+        $dest = "$env:TEMP\W11BarraSinistra.bat"
+        Write-Host "Download in corso..." -ForegroundColor Cyan
+        try {
+            Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop
+            Start-Process $dest -Wait
+            Write-Host "Eseguito." -ForegroundColor Green
+        }
+        catch {
+            Show-Msg "Errore download: $_" "Errore" "Error"
+        }
     })
 
 (Get-Ctrl "BtnInfoReg").Add_Click({
-        $f = Join-Path $PSScriptRoot "ElettronetInfo.reg"
-        if (Test-Path $f) { Start-Process "regedit.exe" -ArgumentList "/s `"$f`"" -Wait; Show-Msg "Registro applicato." } else { Show-Msg "File non trovato: $f" "Errore" "Error" }
+        $url = "https://raw.githubusercontent.com/RC8Dev/WinTools/main/ElettronetInfo.reg"
+        $dest = "$env:TEMP\ElettronetInfo.reg"
+        Write-Host "Download in corso..." -ForegroundColor Cyan
+        try {
+            Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop
+            Start-Process "regedit.exe" -ArgumentList "/s `"$dest`"" -Wait
+            Show-Msg "Registro applicato."
+        }
+        catch {
+            Show-Msg "Errore download: $_" "Errore" "Error"
+        }
     })
 
 (Get-Ctrl "BtnDnsPanel").Add_Click({
-        $f = Join-Path $PSScriptRoot "DnsPanel.exe"
-        if (Test-Path $f) { Start-Process $f } else { Show-Msg "File non trovato: $f" "Errore" "Error" }
+        $url = "https://raw.githubusercontent.com/RC8Dev/WinTools/main/DnsPanel.exe"
+        $dest = "$env:TEMP\DnsPanel.exe"
+        Write-Host "Download in corso..." -ForegroundColor Cyan
+        try {
+            Invoke-WebRequest -Uri $url -OutFile $dest -ErrorAction Stop
+            Start-Process $dest
+        }
+        catch {
+            Show-Msg "Errore download: $_" "Errore" "Error"
+        }
     })
 
 (Get-Ctrl "BtnNetplwiz").Add_Click({ Start-Process "netplwiz" })
