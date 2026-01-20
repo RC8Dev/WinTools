@@ -212,10 +212,18 @@ catch {
     exit
 }
 
-# Imposta Icona se presente
-if (Test-Path "$PSScriptRoot\_Ricona_.ico") {
-    try { $window.Icon = [System.Windows.Media.Imaging.BitmapFrame]::Create([System.Uri]"$PSScriptRoot\_Ricona_.ico") } catch {}
+# Scarica e Imposta Icona da GitHub
+$iconUrl = "https://raw.githubusercontent.com/RC8Dev/WinTools/main/_Ricona_.ico"
+$iconDest = "$env:TEMP\_Ricona_.ico"
+try {
+    if (-not (Test-Path $iconDest)) {
+        Invoke-WebRequest -Uri $iconUrl -OutFile $iconDest -ErrorAction SilentlyContinue
+    }
+    if (Test-Path $iconDest) {
+        $window.Icon = [System.Windows.Media.Imaging.BitmapFrame]::Create([System.Uri]$iconDest)
+    }
 }
+catch {}
 
 # --- 6. Helper e Funzioni ---
 function Get-Ctrl ($name) { 
